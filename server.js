@@ -321,7 +321,7 @@ app.put('/api/me', authRequired, async (req, res) => {
   }
 });
 
-app.get('/api/posts', async (req, res) => {
+app.get('/api/posts', authRequired, async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT p.id, p.content, p.likes, p.comments, p.liked, p.time_label, u.name, u.initials, u.color, u.title AS role
@@ -420,8 +420,10 @@ async function start() {
       console.log(`LinkUp server running at http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error.message);
-    process.exit(1);
+    console.error('Failed to initialize database, starting server anyway:', error.message);
+    app.listen(PORT, () => {
+      console.log(`LinkUp server running at http://localhost:${PORT}`);
+    });
   }
 }
 
