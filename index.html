@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkUp — Conecta con profesionales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       AUTH SCREEN
+  ══════════════════════════════════════ -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-bg-grid"></div>
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="brand-icon">L</div>
+        <span class="brand-name">LinkUp</span>
+        <p class="brand-tagline">Conecta con profesionales</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="auth-card" id="login-form">
+        <h2 class="auth-title">Iniciar sesión</h2>
+        <p class="auth-subtitle">Ingresa tus credenciales para continuar</p>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input class="form-input" type="email" id="login-email" placeholder="tu@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input class="form-input" type="password" id="login-pass" placeholder="••••••••" />
+          <a href="#" class="form-link" onclick="showForgot(event)">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div class="form-error" id="login-error"></div>
+        <button class="btn-primary btn-full" onclick="doLogin()">Iniciar sesión</button>
+        <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showRegister(event)">Regístrate</a></p>
+      </div>
+
+      <!-- Register Form -->
+      <div class="auth-card hidden" id="register-form">
+        <h2 class="auth-title">Crear cuenta</h2>
+        <p class="auth-subtitle">Únete a la red profesional más grande</p>
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input class="form-input" type="text" id="reg-name" placeholder="Tu nombre" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input class="form-input" type="email" id="reg-email" placeholder="tu@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input class="form-input" type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" />
+        </div>
+        <div class="form-error" id="reg-error"></div>
+        <button class="btn-primary btn-full" onclick="doRegister()">Registrarse</button>
+        <p class="auth-switch">¿Ya tienes cuenta? <a href="#" onclick="showLogin(event)">Inicia sesión</a></p>
+      </div>
+
+      <!-- Forgot Password -->
+      <div class="auth-card hidden" id="forgot-form">
+        <h2 class="auth-title">Recuperar contraseña</h2>
+        <p class="auth-subtitle">Te enviaremos un enlace de recuperación</p>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input class="form-input" type="email" id="forgot-email" placeholder="tu@email.com" />
+        </div>
+        <button class="btn-primary btn-full" onclick="doForgot()">Enviar enlace</button>
+        <p class="auth-switch"><a href="#" onclick="showLogin(event)">← Volver al inicio de sesión</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MAIN APP
+  ══════════════════════════════════════ -->
+  <div id="app-screen" class="app-screen hidden">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+          <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú" onclick="toggleMobileSidebar()">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+          <div class="brand-icon topbar-brand-icon">L</div>
+        <span class="brand-name topbar-brand-name">LinkUp</span>
+      </div>
+      <div class="topbar-search">
+        <svg class="search-ico" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="global-search" placeholder="Buscar usuarios, empleos..." oninput="handleGlobalSearch(this.value)" onfocus="navigate('search')" />
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="navigate('feed')" title="Inicio">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" onclick="navigate('search')" title="Buscar">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" onclick="navigate('employment')" title="Empleos">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" onclick="navigate('messages')" title="Mensajes">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="icon-badge icon-badge-alert"></span>
+        </button>
+        <button class="icon-btn" onclick="navigate('notifications')" title="Notificaciones">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="icon-badge icon-badge-info" id="notif-badge"></span>
+        </button>
+        <div class="topbar-avatar" onclick="navigate('profile')" id="topbar-avatar" title="Mi Perfil">HN</div>
+        <button class="icon-btn" onclick="doLogout()" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M16 17l5-5-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+      <!-- SIDEBAR -->
+      <nav class="sidebar">
+        <div class="nav-item active" data-page="feed" onclick="navigate('feed')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          Inicio
+        </div>
+        <div class="nav-item" data-page="profile" onclick="navigate('profile')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
+          Mi Perfil
+        </div>
+        <div class="nav-item" data-page="search" onclick="navigate('search')">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Buscar
+        </div>
+        <div class="nav-sep"></div>
+        <div class="nav-label">Social</div>
+        <div class="nav-item" data-page="messages" onclick="navigate('messages')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Mensajes
+        </div>
+        <div class="nav-item" data-page="notifications" onclick="navigate('notifications')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Notificaciones
+          <span class="nav-badge" id="nav-notif-badge">3</span>
+        </div>
+        <div class="nav-sep"></div>
+        <div class="nav-label">Empleo</div>
+        <div class="nav-item" data-page="employment" onclick="navigate('employment')">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Empleos
+        </div>
+        <div class="nav-sep" style="margin-top:auto"></div>
+        <div class="nav-item nav-logout" onclick="doLogout()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Cerrar sesión
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+
+        <!-- ── FEED PAGE ── -->
+        <div class="page active" id="page-feed">
+          <div class="feed-layout">
+            <div class="feed-center">
+              <!-- Create post -->
+              <div class="card create-post-card">
+                <div class="create-post-top">
+                  <div class="avatar md" id="post-avatar">HN</div>
+                  <textarea id="post-textarea" placeholder="¿Qué quieres compartir?"></textarea>
+                </div>
+                <div class="create-post-bottom">
+                  <div class="post-media-btns">
+                    <button class="media-btn media-btn-text" title="Imagen">
+                      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                      <span>Imagen</span>
+                    </button>
+                  </div>
+                  <button class="btn-primary publish-btn" onclick="publishPost()">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M21 3L10 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 3l-7 18-4-8-8-4 19-6z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>Publicar</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Posts list -->
+              <div id="posts-container"></div>
+            </div>
+            <aside class="feed-aside">
+              <div class="card aside-card">
+                <h3 class="aside-title">Personas que quizás conozcas</h3>
+                <div id="suggestions-list"></div>
+              </div>
+              <div class="card aside-card">
+                <h3 class="aside-title">Tendencias</h3>
+                <div class="trends-list">
+                  <span class="trend-tag">#DesarrolloWeb</span>
+                  <span class="trend-tag">#Python2026</span>
+                  <span class="trend-tag">#TechCúcuta</span>
+                  <span class="trend-tag">#IngenieríaSistemas</span>
+                  <span class="trend-tag">#LinkUp</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <!-- ── PROFILE PAGE ── -->
+        <div class="page hidden" id="page-profile">
+          <div class="profile-layout">
+            <div class="profile-banner"></div>
+            <div class="card profile-card">
+              <div class="profile-header">
+                <div class="profile-avatar-wrap">
+                  <div class="avatar lg" id="profile-avatar-display">HN</div>
+                </div>
+                <div class="profile-info">
+                  <h1 id="display-name">Heily Natalia Escobar Mendoza</h1>
+                  <p class="profile-title" id="display-title">Ingeniería de Sistemas — Universidad Simón Bolívar</p>
+                  <div class="profile-meta" id="display-location">
+                    <span>📧 heily.escobar@unisimon.edu.co</span>
+                    <span>📍 Cúcuta, Colombia</span>
+                    <span>📅 Miembro desde 2024</span>
+                  </div>
+                  <p class="profile-bio" id="display-bio">Apasionada por el desarrollo de software y la tecnología. Especializada en React, Python y arquitecturas cloud.</p>
+                  <div class="profile-actions">
+                    <button class="btn-primary" onclick="toggleEditForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:6px;display:inline-block"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar perfil</button>
+                    <button class="btn-danger" onclick="showDeleteModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:6px;display:inline-block"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Eliminar cuenta</button>
+                  </div>
+                </div>
+              </div>
+              <div class="profile-stats">
+                <div class="stat-box">
+                  <span class="stat-number">42</span>
+                  <span class="stat-label">Publicaciones</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-number">1,234</span>
+                  <span class="stat-label">Seguidores</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-number">567</span>
+                  <span class="stat-label">Siguiendo</span>
+                </div>
+              </div>
+            </div>
+            <!-- Edit Form -->
+            <div class="card edit-form-card hidden" id="edit-form">
+              <div class="edit-form-header">
+                <div class="edit-avatar-wrap">
+                  <div class="avatar lg" id="edit-avatar-display">HN</div>
+                </div>
+                <div class="edit-form-content">
+                  <div class="form-group">
+                    <label class="form-label">Nombre completo</label>
+                    <input class="form-input" id="ef-name" value="Heily Natalia Escobar Mendoza" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Título profesional</label>
+                    <input class="form-input" id="ef-title" value="Ingeniería de Sistemas — Universidad Simón Bolívar" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Correo electrónico</label>
+                    <input class="form-input" id="ef-email" type="email" value="heily.escobar@unisimon.edu.co" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Ubicación</label>
+                    <input class="form-input" id="ef-location" value="Cúcuta, Colombia" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Biografía</label>
+                    <textarea class="form-input" id="ef-bio" rows="4">Apasionada por el desarrollo de software y la tecnología. Especializada en React, Python y arquitecturas cloud.</textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button class="btn-success" onclick="saveProfile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px;margin-right:6px;display:inline-block"><path d="M5 3h12l2 2v16H5z"/><path d="M8 3v6h8V3"/><path d="M8 17h8"/></svg>Guardar cambios</button>
+                    <button class="btn-cancel" onclick="toggleEditForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px;margin-right:6px;display:inline-block"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Cancelar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── SEARCH PAGE ── -->
+        <div class="page hidden" id="page-search">
+          <h2 class="search-page-title">Descubrir personas</h2>
+          <div class="section-header search-page-header">
+            <div class="search-page-bar">
+              <input type="text" id="page-search-input" placeholder="Buscar por nombre o profesión..." />
+            </div>
+            <span class="result-count" id="search-result-count"></span>
+          </div>
+          <div id="search-results-container"></div>
+        </div>
+
+        <!-- ── MESSAGES PAGE ── -->
+        <div class="page hidden" id="page-messages">
+          <div class="messages-layout">
+            <div class="contacts-panel">
+              <div class="contacts-header">Mensajes</div>
+              <div class="contacts-search-wrap">
+                <input class="contacts-search" type="text" placeholder="Buscar conversaciones..." />
+              </div>
+              <div id="contacts-list"></div>
+            </div>
+            <div class="chat-panel">
+              <div class="chat-header" id="chat-header">
+                <div class="avatar sm" id="chat-av-display">CR</div>
+                <div>
+                  <div class="chat-name" id="chat-contact-name">Carlos Rodríguez</div>
+                  <div class="chat-status">● En línea</div>
+                </div>
+              </div>
+              <div class="chat-messages" id="chat-messages"></div>
+              <div class="chat-input-area">
+                <input class="chat-input" id="chat-input" type="text" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')sendMessage()" />
+                <button class="btn-send" onclick="sendMessage()" aria-label="Enviar mensaje">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M4 12.5L20.5 3.5L13.5 20L11 13.5L4 12.5Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+                    <path d="M11 13.5L20.5 3.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── NOTIFICATIONS PAGE ── -->
+        <div class="page hidden" id="page-notifications">
+          <div class="section-header">
+            <h2 class="page-title">Notificaciones</h2>
+            <button class="btn-mark-read" onclick="markAllRead()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="11"></circle>
+                <polyline points="16 8 10 14 8 12"></polyline>
+              </svg>
+              Marcar todas como leídas
+            </button>
+          </div>
+          <div id="notifications-list"></div>
+        </div>
+
+        <!-- ── EMPLOYMENT PAGE ── -->
+        <div class="page hidden" id="page-employment">
+          <div class="section-header">
+            <div class="employment-title-wrap">
+              <h2 class="page-title">Ofertas de empleo</h2>
+              <p class="employment-subtitle">Encuentra tu próxima oportunidad profesional</p>
+            </div>
+            <button class="btn-primary btn-post-job" onclick="toggleJobForm()">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Publicar oferta
+            </button>
+          </div>
+
+          <!-- Publish job form modal -->
+          <div class="job-form-overlay hidden" id="publish-job-overlay">
+            <div class="card publish-job-form" id="publish-job-form">
+              <div class="job-form-header">
+                <div>
+                  <h3 class="section-title">Publicar nueva oferta de empleo</h3>
+                  <p class="form-hint">Completa los detalles de la oferta de trabajo</p>
+                </div>
+                <button class="job-form-close" onclick="toggleJobForm(true)" aria-label="Cerrar formulario">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Título del puesto *</label><input class="form-input" id="jf-title" placeholder="Ej. Desarrollador Frontend" /></div>
+                <div class="form-group"><label class="form-label">Empresa *</label><input class="form-input" id="jf-company" placeholder="Nombre de la empresa" /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Ubicación</label><input class="form-input" id="jf-location" placeholder="Ciudad, País" /></div>
+                <div class="form-group"><label class="form-label">Salario</label><input class="form-input" id="jf-salary" placeholder="€40,000 - €60,000" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Tipo de empleo</label><input class="form-input" id="jf-type" placeholder="Tiempo completo" /></div>
+              <div class="form-group"><label class="form-label">Descripción *</label><textarea class="form-input" id="jf-desc" rows="4" placeholder="Describe el puesto, responsabilidades y requisitos..."></textarea></div>
+              <div class="form-error" id="job-form-error"></div>
+              <div class="job-form-actions">
+                <button class="btn-primary job-form-submit" onclick="publishJob()">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2l-7 20-3-9-9-3 19-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Publicar oferta
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="emp-tabs">
+            <button class="emp-tab active" id="tab-available-btn" onclick="switchEmpTab('available')">Disponibles <span id="count-available"></span></button>
+            <button class="emp-tab" id="tab-applied-btn" onclick="switchEmpTab('applied')">Aplicadas <span id="count-applied"></span></button>
+          </div>
+          <div id="jobs-available-list"></div>
+          <div id="jobs-applied-list" class="hidden"></div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM MODAL ── -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal-box">
+      <h3 id="modal-title">¿Estás seguro?</h3>
+      <p id="modal-desc">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn-danger" id="modal-confirm-btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile sidebar overlay -->
+  <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay hidden" onclick="hideMobileSidebar()"></div>
+
+  <!-- ── TOAST ── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+  <script>
+    window.doLogout = function() {
+      if (typeof showConfirmModal === 'function') {
+        showConfirmModal(
+          '¿Cerrar sesión?',
+          'Se cerrará tu sesión en LinkUp.',
+          function() {
+            if (typeof STATE !== 'undefined') STATE.currentUser = null;
+            try { localStorage.removeItem('linkup_auth_token'); } catch (error) {}
+            const appScreen = document.getElementById('app-screen');
+            const authScreen = document.getElementById('auth-screen');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const forgotForm = document.getElementById('forgot-form');
+            if (appScreen) appScreen.classList.add('hidden');
+            if (authScreen) authScreen.classList.remove('hidden');
+            if (loginForm) loginForm.classList.remove('hidden');
+            if (registerForm) registerForm.classList.add('hidden');
+            if (forgotForm) forgotForm.classList.add('hidden');
+            if (typeof showLogin === 'function') showLogin();
+            if (typeof showToast === 'function') showToast('Sesión cerrada correctamente');
+          }
+        );
+        return;
+      }
+      if (typeof STATE !== 'undefined') STATE.currentUser = null;
+      try { localStorage.removeItem('linkup_auth_token'); } catch (error) {}
+      const appScreen = document.getElementById('app-screen');
+      const authScreen = document.getElementById('auth-screen');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const forgotForm = document.getElementById('forgot-form');
+      if (appScreen) appScreen.classList.add('hidden');
+      if (authScreen) authScreen.classList.remove('hidden');
+      if (loginForm) loginForm.classList.remove('hidden');
+      if (registerForm) registerForm.classList.add('hidden');
+      if (forgotForm) forgotForm.classList.add('hidden');
+      if (typeof showLogin === 'function') showLogin();
+      if (typeof showToast === 'function') showToast('Sesión cerrada correctamente');
+    };
+  </script>
+</body>
+</html>
