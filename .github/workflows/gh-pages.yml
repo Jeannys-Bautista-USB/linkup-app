@@ -18,7 +18,7 @@ jobs:
       - name: Build (skip if not needed)
         run: echo "Publishing repository root to GitHub Pages"
       - uses: actions/configure-pages@v1
-      - uses: actions/upload-pages-artifact@v1
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: ./
       - uses: actions/deploy-pages@v1
