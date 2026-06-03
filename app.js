@@ -17,6 +17,8 @@ const STATE = {
 
 const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000/api' : '/api';
 const AUTH_TOKEN_KEY = 'linkup_auth_token';
+const LOCAL_USERS_KEY = 'linkup_local_users';
+const LOCAL_SESSION_KEY = 'linkup_local_session';
 
 // Colores de avatar
 const AVATAR_COLORS = ['#7C3AED','#2563EB','#059669','#D97706','#DC2626','#0891B2','#9333EA','#065F46'];
@@ -160,25 +162,69 @@ async function apiRequest(path, options = {}) {
   return data;
 }
 
+function getLocalUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY) || '[]');
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveLocalUsers(users) {
+  localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+}
+
+async function hashPassword(password) {
+  const bytes = new TextEncoder().encode(String(password));
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function saveLocalSession(user) {
+  localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(user));
+}
+
+function loadLocalSession() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || 'null');
+  } catch (error) {
+    return null;
+  }
+}
+
 function applyAuthenticatedUser(user, token) {
   if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);
   STATE.currentUser = user;
+  saveLocalSession(user);
   enterApp();
 }
 
 function clearAuthSession() {
   localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem(LOCAL_SESSION_KEY);
 }
 
 async function bootstrapSession() {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (!token) return;
+  if (!token) {
+    const localUser = loadLocalSession();
+    if (localUser) {
+      STATE.currentUser = localUser;
+      enterApp();
+    }
+    return;
+  }
 
   try {
     const data = await apiRequest('/me');
     applyAuthenticatedUser(data.user);
   } catch (error) {
     clearAuthSession();
+    const localUser = loadLocalSession();
+    if (localUser) {
+      STATE.currentUser = localUser;
+      enterApp();
+    }
   }
 }
 
@@ -230,9 +276,23 @@ async function doLogin() {
     });
     applyAuthenticatedUser(data.user, data.token);
   } catch (error) {
+    const localUsers = getLocalUsers();
+    const hashedPass = await hashPassword(pass);
+    const localUser = localUsers.find(user => user.email.toLowerCase() === email.toLowerCase() && user.passwordHash === hashedPass);
+    if (localUser) {
+      applyAuthenticatedUser({
+        name: localUser.name,
+        initials: localUser.initials,
+        email: localUser.email,
+        title: localUser.title || '',
+        location: localUser.location || '',
+        bio: localUser.bio || '',
+        color: localUser.color || avatarColor(localUser.name || localUser.initials),
+      });
+      return;
+    }
     if (email === DEMO_CREDENTIALS.email && pass === DEMO_CREDENTIALS.password) {
-      STATE.currentUser = { name: 'Heily Natalia Escobar Mendoza', initials: 'HN', email };
-      enterApp();
+      applyAuthenticatedUser({ name: 'Heily Natalia Escobar Mendoza', initials: 'HN', email });
       return;
     }
     setErr('login-error', error.message || 'No se pudo iniciar sesión');
@@ -256,7 +316,41 @@ async function doRegister() {
     });
     applyAuthenticatedUser(data.user, data.token);
   } catch (error) {
-    setErr('reg-error', error.message || 'No se pudo registrar');
+    try {
+      const passwordHash = await hashPassword(pass);
+      const initials = name.split(' ').filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('') || 'U';
+      const localUsers = getLocalUsers();
+
+      if (localUsers.some(user => user.email.toLowerCase() === email.toLowerCase())) {
+        setErr('reg-error', 'Ese correo ya está registrado');
+        return;
+      }
+
+      const localUser = {
+        name,
+        email,
+        initials,
+        title: '',
+        location: '',
+        bio: '',
+        color: avatarColor(name || email),
+        passwordHash,
+      };
+
+      localUsers.push(localUser);
+      saveLocalUsers(localUsers);
+      applyAuthenticatedUser({
+        name,
+        email,
+        initials,
+        title: '',
+        location: '',
+        bio: '',
+        color: localUser.color,
+      });
+    } catch (fallbackError) {
+      setErr('reg-error', error.message || 'No se pudo registrar');
+    }
   }
 }
 
